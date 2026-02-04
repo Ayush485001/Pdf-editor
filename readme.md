@@ -40,13 +40,6 @@ cd pdf-editor
 ![PDF Editor Interface](./images/screenshots/placeholder1.png)
 *Main interface with document loaded*
 
-![Editing Tools](https://imgur.com/placeholder2.png)
-*Available editing tools and options*
-
-![Document Management](https://imgur.com/placeholder3.png)
-*Document management features*
-
-> Replace the image URLs with your own screenshots. You can upload images to GitHub issues, use imgur.com, or use relative paths like `./screenshots/interface.png` if you store them in a screenshots folder.
 
 ## Technologies Used
 
