@@ -25,6 +25,9 @@
             --warning: #f59e0b;
             --error: #ef4444;
             --info: #3b82f6;
+            --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-spring: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
         /* Dark Theme (Default) */
@@ -64,7 +67,9 @@
             min-height: 100vh;
             overflow-x: hidden;
             line-height: 1.6;
-            transition: background 0.3s, color 0.3s;
+            transition: background var(--transition-smooth), color var(--transition-smooth);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         /* Animated Background */
@@ -79,7 +84,8 @@
                 radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
                 radial-gradient(circle at 80% 20%, rgba(236, 72, 153, 0.15) 0%, transparent 50%);
             animation: bgPulse 10s ease-in-out infinite;
-            transition: opacity 0.3s;
+            transition: opacity var(--transition-smooth);
+            will-change: opacity;
         }
 
         [data-theme="light"] .bg-animation {
@@ -104,7 +110,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            transition: all 0.3s;
+            transition: all var(--transition-smooth);
+            will-change: transform;
         }
 
         .logo {
@@ -116,11 +123,22 @@
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            animation: logoGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes logoGlow {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.2); }
         }
 
         .logo i {
             font-size: 1.5rem;
             -webkit-text-fill-color: var(--primary);
+            transition: transform var(--transition-spring);
+        }
+
+        .logo:hover i {
+            transform: rotate(15deg) scale(1.1);
         }
 
         .header-actions {
@@ -135,14 +153,14 @@
             padding: 1rem;
         }
 
-        /* Upload Area */
+        /* Upload Area - Optimized */
         .upload-zone {
             border: 2px dashed var(--surface-light);
             border-radius: 24px;
             padding: 3rem 2rem;
             text-align: center;
             background: var(--surface);
-            transition: all 0.3s ease;
+            transition: all var(--transition-smooth);
             margin-bottom: 2rem;
             position: relative;
             overflow: hidden;
@@ -151,39 +169,34 @@
             -webkit-user-select: none;
             user-select: none;
             touch-action: manipulation;
+            will-change: transform, border-color, background;
+            transform: translateZ(0);
         }
 
         .upload-zone:active {
-            transform: scale(0.98);
-        }
-
-        .upload-zone::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(99, 102, 241, 0.1), transparent);
-            transform: rotate(45deg);
-            transition: all 0.5s;
-            opacity: 0;
-        }
-
-        .upload-zone.active::before {
-            animation: shimmer 1.5s infinite;
-            opacity: 1;
-        }
-
-        @keyframes shimmer {
-            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+            transform: scale(0.98) translateZ(0);
         }
 
         .upload-zone.dragover {
             border-color: var(--primary);
             background: rgba(99, 102, 241, 0.1);
-            transform: scale(1.02);
+            transform: scale(1.02) translateZ(0);
+        }
+
+        .upload-zone::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .upload-zone.dragover::before {
+            left: 100%;
+            transition: left 0.5s;
         }
 
         .upload-icon {
@@ -192,6 +205,7 @@
             margin-bottom: 1rem;
             animation: float 3s ease-in-out infinite;
             pointer-events: none;
+            will-change: transform;
         }
 
         @keyframes float {
@@ -204,12 +218,22 @@
             margin-bottom: 0.5rem;
             color: var(--text);
             pointer-events: none;
+            transition: transform var(--transition-fast);
+        }
+
+        .upload-zone:hover .upload-text {
+            transform: translateY(-2px);
         }
 
         .upload-subtext {
             color: var(--text-muted);
             font-size: 0.875rem;
             pointer-events: none;
+            transition: opacity var(--transition-fast);
+        }
+
+        .upload-zone:hover .upload-subtext {
+            opacity: 0.8;
         }
 
         .file-input {
@@ -223,12 +247,20 @@
             z-index: 10;
         }
 
-        /* Feature Grid */
+        /* Feature Grid - Optimized */
         .features-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 1rem;
             margin-bottom: 2rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity var(--transition-smooth), transform var(--transition-smooth);
+        }
+
+        .features-grid.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         .feature-card {
@@ -237,36 +269,44 @@
             padding: 1.5rem 1rem;
             text-align: center;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all var(--transition-fast);
             border: 1px solid var(--border);
             position: relative;
             overflow: hidden;
+            will-change: transform, box-shadow;
+            transform: translateZ(0);
         }
 
-        .feature-card::after {
+        .feature-card::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
+            right: 0;
+            bottom: 0;
             background: linear-gradient(135deg, transparent, var(--hover-bg));
             opacity: 0;
-            transition: opacity 0.3s;
+            transition: opacity var(--transition-fast);
         }
 
-        .feature-card:hover::after {
+        .feature-card:hover::before {
             opacity: 1;
         }
 
+        .feature-card:hover {
+            transform: translateY(-4px) translateZ(0);
+            box-shadow: var(--shadow);
+        }
+
         .feature-card:active {
-            transform: scale(0.95);
+            transform: scale(0.95) translateZ(0);
         }
 
         .feature-card.active {
             border-color: var(--primary);
             background: rgba(99, 102, 241, 0.1);
-            box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+            box-shadow: 0 0 30px rgba(99, 102, 241, 0.4);
+            transform: translateY(-2px) scale(1.02) translateZ(0);
         }
 
         .feature-card.merge { border-top: 3px solid #3b82f6; }
@@ -280,6 +320,11 @@
             font-size: 2rem;
             margin-bottom: 0.75rem;
             display: block;
+            transition: transform var(--transition-spring);
+        }
+
+        .feature-card:hover .feature-icon {
+            transform: scale(1.1) rotate(5deg);
         }
 
         .feature-card.merge .feature-icon { color: #3b82f6; }
@@ -294,14 +339,20 @@
             font-weight: 600;
             margin-bottom: 0.25rem;
             color: var(--text);
+            transition: transform var(--transition-fast);
+        }
+
+        .feature-card:hover .feature-title {
+            transform: translateY(-2px);
         }
 
         .feature-desc {
             font-size: 0.75rem;
             color: var(--text-muted);
+            transition: opacity var(--transition-fast);
         }
 
-        /* PDF Workspace */
+        /* PDF Workspace - Optimized */
         .pdf-workspace {
             background: var(--surface);
             border-radius: 24px;
@@ -309,16 +360,22 @@
             min-height: 400px;
             display: none;
             border: 1px solid var(--border);
+            opacity: 0;
+            transform: translateY(30px) scale(0.95);
+            transition: opacity var(--transition-smooth), transform var(--transition-smooth);
+            will-change: opacity, transform;
         }
 
         .pdf-workspace.active {
             display: block;
-            animation: slideUp 0.5s ease;
+            animation: workspaceEnter 0.5s var(--transition-spring) forwards;
         }
 
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes workspaceEnter {
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
 
         .workspace-header {
@@ -346,6 +403,12 @@
             justify-content: center;
             font-size: 1.5rem;
             box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            transition: transform var(--transition-spring);
+            will-change: transform;
+        }
+
+        .pdf-info:hover .pdf-thumbnail {
+            transform: rotate(5deg) scale(1.05);
         }
 
         .pdf-details h3 {
@@ -365,7 +428,7 @@
             flex-wrap: wrap;
         }
 
-        /* Page Thumbnails Grid */
+        /* Page Thumbnails Grid - Optimized */
         .pages-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
@@ -378,20 +441,32 @@
             border-radius: 12px;
             overflow: hidden;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all var(--transition-fast);
             border: 2px solid transparent;
             position: relative;
             aspect-ratio: 1/1.4;
+            will-change: transform, box-shadow;
+            transform: translateZ(0);
+            opacity: 0;
+            animation: pageItemEnter 0.4s var(--transition-spring) forwards;
+        }
+
+        @keyframes pageItemEnter {
+            to {
+                opacity: 1;
+            }
         }
 
         .page-item:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow);
+            transform: translateY(-6px) scale(1.02) translateZ(0);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            z-index: 10;
         }
 
         .page-item.selected {
             border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.3), 0 20px 40px rgba(99, 102, 241, 0.2);
+            transform: translateY(-4px) scale(1.02) translateZ(0);
         }
 
         .page-number {
@@ -405,6 +480,12 @@
             text-align: center;
             font-size: 0.875rem;
             font-weight: 600;
+            transform: translateY(100%);
+            transition: transform var(--transition-fast);
+        }
+
+        .page-item:hover .page-number {
+            transform: translateY(0);
         }
 
         .page-checkbox {
@@ -419,18 +500,33 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s;
+            transition: all var(--transition-fast);
+            transform: scale(0);
+            will-change: transform;
+        }
+
+        .page-item:hover .page-checkbox,
+        .page-item.selected .page-checkbox {
+            transform: scale(1);
         }
 
         .page-item.selected .page-checkbox {
             background: var(--primary);
             border-color: var(--primary);
+            animation: checkboxPop 0.3s var(--transition-spring);
+        }
+
+        @keyframes checkboxPop {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
         }
 
         .page-checkbox i {
             font-size: 0.75rem;
             opacity: 0;
             color: white;
+            transition: opacity var(--transition-fast);
         }
 
         .page-item.selected .page-checkbox i {
@@ -442,15 +538,24 @@
             height: 100%;
             object-fit: cover;
             background: white;
+            transition: transform var(--transition-smooth);
         }
 
-        /* Action Panel */
+        .page-item:hover .page-preview {
+            transform: scale(1.05);
+        }
+
+        /* Action Panel - Optimized */
         .action-panel {
             background: var(--surface-light);
             border-radius: 16px;
             padding: 1.5rem;
             margin-top: 1.5rem;
             display: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity var(--transition-smooth), transform var(--transition-smooth);
+            will-change: opacity, transform;
         }
 
         [data-theme="light"] .action-panel {
@@ -459,12 +564,14 @@
 
         .action-panel.active {
             display: block;
-            animation: fadeIn 0.3s ease;
+            animation: panelEnter 0.4s var(--transition-spring) forwards;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+        @keyframes panelEnter {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .panel-header {
@@ -499,6 +606,11 @@
         .input-group label {
             font-size: 0.875rem;
             color: var(--text-muted);
+            transition: color var(--transition-fast);
+        }
+
+        .input-group:focus-within label {
+            color: var(--primary);
         }
 
         .input-group input, .input-group select {
@@ -508,16 +620,18 @@
             padding: 0.75rem;
             color: var(--text);
             font-size: 1rem;
-            transition: all 0.3s;
+            transition: all var(--transition-fast);
+            will-change: border-color, box-shadow;
         }
 
         .input-group input:focus, .input-group select:focus {
             outline: none;
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+            transform: translateY(-1px);
         }
 
-        /* Buttons */
+        /* Buttons - Optimized */
         .btn {
             padding: 0.75rem 1.5rem;
             border-radius: 12px;
@@ -525,7 +639,7 @@
             font-size: 0.9375rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all var(--transition-fast);
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -534,9 +648,11 @@
             overflow: hidden;
             background: var(--surface-light);
             color: var(--text);
+            will-change: transform, box-shadow;
+            transform: translateZ(0);
         }
 
-        .btn::after {
+        .btn::before {
             content: '';
             position: absolute;
             top: 50%;
@@ -549,9 +665,17 @@
             transition: width 0.6s, height 0.6s;
         }
 
-        .btn:active::after {
+        .btn:active::before {
             width: 300px;
             height: 300px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px) translateZ(0);
+        }
+
+        .btn:active {
+            transform: translateY(0) scale(0.98) translateZ(0);
         }
 
         .btn-primary {
@@ -561,8 +685,7 @@
         }
 
         .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.5);
         }
 
         .btn-secondary {
@@ -592,7 +715,56 @@
             border-radius: 10px;
         }
 
-        /* Merge List Styles */
+        /* Status Indicator - Optimized */
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+            animation: statusEnter 0.4s var(--transition-spring);
+            will-change: transform, opacity;
+        }
+
+        @keyframes statusEnter {
+            from {
+                opacity: 0;
+                transform: translateY(-10px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .status-info {
+            background: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .status-success {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .status-warning {
+            background: rgba(245, 158, 11, 0.15);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .status-error {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        /* Merge List Styles - Optimized */
         .merge-list {
             margin-top: 1rem;
             display: flex;
@@ -608,7 +780,20 @@
             background: var(--background);
             border-radius: 12px;
             border: 2px dashed var(--border);
-            transition: all 0.3s;
+            transition: all var(--transition-fast);
+            will-change: transform, border-color, background;
+            animation: mergeItemEnter 0.4s var(--transition-spring);
+        }
+
+        @keyframes mergeItemEnter {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
 
         .merge-item.ready {
@@ -620,10 +805,15 @@
         .merge-item i {
             font-size: 1.5rem;
             color: #ef4444;
+            transition: transform var(--transition-spring);
         }
 
         .merge-item.ready i {
             color: var(--success);
+        }
+
+        .merge-item:hover i {
+            transform: scale(1.1);
         }
 
         .merge-item-info {
@@ -645,93 +835,7 @@
             color: var(--success);
         }
 
-        /* Status Indicator */
-        .status-indicator {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-size: 0.875rem;
-            font-weight: 500;
-            margin-bottom: 1rem;
-            animation: slideIn 0.3s ease;
-        }
-
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .status-info {
-            background: rgba(59, 130, 246, 0.2);
-            color: #60a5fa;
-            border: 1px solid rgba(59, 130, 246, 0.3);
-        }
-
-        .status-success {
-            background: rgba(16, 185, 129, 0.2);
-            color: #34d399;
-            border: 1px solid rgba(16, 185, 129, 0.3);
-        }
-
-        .status-warning {
-            background: rgba(245, 158, 11, 0.2);
-            color: #fbbf24;
-            border: 1px solid rgba(245, 158, 11, 0.3);
-        }
-
-        .status-error {
-            background: rgba(239, 68, 68, 0.2);
-            color: #f87171;
-            border: 1px solid rgba(239, 68, 68, 0.3);
-        }
-
-        /* Progress Bar */
-        .progress-container {
-            display: none;
-            margin: 1rem 0;
-        }
-
-        .progress-container.active {
-            display: block;
-        }
-
-        .progress-bar {
-            height: 8px;
-            background: var(--surface-light);
-            border-radius: 4px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            width: 0%;
-            transition: width 0.3s ease;
-            border-radius: 4px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .progress-fill::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-            animation: progressShimmer 1.5s infinite;
-        }
-
-        @keyframes progressShimmer {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-
-        /* Toast Notifications - Enhanced */
+        /* Toast Notifications - Optimized */
         .toast-container {
             position: fixed;
             bottom: 2rem;
@@ -743,6 +847,7 @@
             gap: 0.75rem;
             width: 90%;
             max-width: 400px;
+            pointer-events: none;
         }
 
         .toast {
@@ -754,11 +859,35 @@
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            animation: toastSlideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: toastEnter 0.5s var(--transition-spring) forwards;
             backdrop-filter: blur(20px);
             border: 1px solid var(--border);
             position: relative;
             overflow: hidden;
+            pointer-events: all;
+            will-change: transform, opacity;
+        }
+
+        @keyframes toastEnter {
+            from {
+                opacity: 0;
+                transform: translate(-50%, 30px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translate(0, 0) scale(1);
+            }
+        }
+
+        .toast.exit {
+            animation: toastExit 0.3s var(--transition-smooth) forwards;
+        }
+
+        @keyframes toastExit {
+            to {
+                opacity: 0;
+                transform: translate(0, 20px) scale(0.9);
+            }
         }
 
         .toast::before {
@@ -768,17 +897,6 @@
             top: 0;
             bottom: 0;
             width: 4px;
-        }
-
-        @keyframes toastSlideUp {
-            from { 
-                opacity: 0; 
-                transform: translate(-50%, 100%) scale(0.9); 
-            }
-            to { 
-                opacity: 1; 
-                transform: translate(-50%, 0) scale(1); 
-            }
         }
 
         .toast.success { 
@@ -818,6 +936,13 @@
             justify-content: center;
             font-size: 1rem;
             flex-shrink: 0;
+            animation: iconPop 0.5s var(--transition-spring);
+        }
+
+        @keyframes iconPop {
+            0% { transform: scale(0) rotate(-180deg); }
+            70% { transform: scale(1.2) rotate(10deg); }
+            100% { transform: scale(1) rotate(0); }
         }
 
         .toast.success .toast-icon {
@@ -863,28 +988,18 @@
             cursor: pointer;
             padding: 0.25rem;
             border-radius: 4px;
-            transition: all 0.2s;
+            transition: all var(--transition-fast);
+            opacity: 0.7;
         }
 
         .toast-close:hover {
+            opacity: 1;
             background: var(--hover-bg);
             color: var(--text);
+            transform: rotate(90deg);
         }
 
-        /* Loading Spinner */
-        .spinner {
-            width: 48px;
-            height: 48px;
-            border: 4px solid var(--surface-light);
-            border-top-color: var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
+        /* Loading Overlay - Optimized */
         .loading-overlay {
             position: fixed;
             top: 0;
@@ -892,22 +1007,50 @@
             width: 100%;
             height: 100%;
             background: var(--background);
-            opacity: 0.98;
             z-index: 3000;
             display: none;
             align-items: center;
             justify-content: center;
             flex-direction: column;
             gap: 1.5rem;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(20px);
+            opacity: 0;
+            transition: opacity var(--transition-smooth);
         }
 
         .loading-overlay.active {
             display: flex;
+            opacity: 1;
+        }
+
+        .spinner {
+            width: 56px;
+            height: 56px;
+            border: 4px solid var(--surface-light);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            will-change: transform;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
         .loading-content {
             text-align: center;
+            animation: contentFadeIn 0.5s var(--transition-smooth);
+        }
+
+        @keyframes contentFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .loading-text {
@@ -929,20 +1072,25 @@
             border-radius: 2px;
             overflow: hidden;
             margin-top: 1rem;
+            position: relative;
         }
 
         .loading-progress-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
             height: 100%;
             background: linear-gradient(90deg, var(--primary), var(--secondary));
-            width: 0%;
-            transition: width 0.3s ease;
-            animation: loadingProgress 2s ease-in-out infinite;
+            width: 30%;
+            border-radius: 2px;
+            animation: progressMove 1.5s ease-in-out infinite;
+            will-change: transform;
         }
 
-        @keyframes loadingProgress {
-            0% { width: 0%; margin-left: 0%; }
-            50% { width: 50%; margin-left: 25%; }
-            100% { width: 0%; margin-left: 100%; }
+        @keyframes progressMove {
+            0% { transform: translateX(-100%); }
+            50% { transform: translateX(233%); }
+            100% { transform: translateX(-100%); }
         }
 
         /* Empty State */
@@ -950,12 +1098,19 @@
             text-align: center;
             padding: 3rem 1rem;
             color: var(--text-muted);
+            animation: fadeIn 0.5s var(--transition-smooth);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         .empty-state i {
             font-size: 4rem;
             margin-bottom: 1rem;
             opacity: 0.5;
+            animation: float 3s ease-in-out infinite;
         }
 
         /* Responsive */
@@ -978,13 +1133,25 @@
             }
         }
 
-        /* Text Editor Overlay */
+        /* Text Editor */
         .text-editor {
             background: var(--background);
             border-radius: 12px;
             padding: 1rem;
             margin-top: 1rem;
             border: 1px solid var(--border);
+            animation: editorEnter 0.4s var(--transition-smooth);
+        }
+
+        @keyframes editorEnter {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .toolbar {
@@ -1007,13 +1174,19 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s;
+            transition: all var(--transition-fast);
             border: 1px solid var(--border);
+            will-change: transform, background;
         }
 
         .toolbar-btn:hover {
             background: var(--primary);
             color: white;
+            transform: translateY(-2px);
+        }
+
+        .toolbar-btn:active {
+            transform: translateY(0) scale(0.95);
         }
 
         .editor-content {
@@ -1024,6 +1197,12 @@
             border-radius: 8px;
             outline: none;
             border: 1px solid var(--border);
+            transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+        }
+
+        .editor-content:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
         }
 
         /* Password Input */
@@ -1033,13 +1212,27 @@
             border-radius: 2px;
             margin-top: 0.5rem;
             overflow: hidden;
+            position: relative;
         }
 
         .password-strength-bar {
             height: 100%;
             width: 0;
-            transition: all 0.3s;
+            transition: all var(--transition-smooth);
             border-radius: 2px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .password-strength-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
         }
 
         .strength-weak { width: 33%; background: var(--error); }
@@ -1049,6 +1242,7 @@
         /* Recent Files */
         .recent-files {
             margin-top: 2rem;
+            animation: slideUp 0.5s var(--transition-smooth);
         }
 
         .section-title {
@@ -1075,14 +1269,35 @@
             align-items: center;
             justify-content: space-between;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all var(--transition-fast);
             border: 1px solid var(--border);
+            will-change: transform, border-color;
+            animation: fileItemEnter 0.4s var(--transition-spring);
+            animation-fill-mode: both;
+        }
+
+        .file-item:nth-child(1) { animation-delay: 0.05s; }
+        .file-item:nth-child(2) { animation-delay: 0.1s; }
+        .file-item:nth-child(3) { animation-delay: 0.15s; }
+        .file-item:nth-child(4) { animation-delay: 0.2s; }
+        .file-item:nth-child(5) { animation-delay: 0.25s; }
+
+        @keyframes fileItemEnter {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
 
         .file-item:hover {
             border-color: var(--primary);
-            transform: translateX(4px);
+            transform: translateX(8px);
             background: var(--hover-bg);
+            box-shadow: var(--shadow);
         }
 
         .file-info {
@@ -1100,6 +1315,11 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: transform var(--transition-spring);
+        }
+
+        .file-item:hover .file-icon {
+            transform: scale(1.1) rotate(10deg);
         }
 
         .file-meta h4 {
@@ -1123,11 +1343,12 @@
             border-radius: 24px 24px 0 0;
             padding: 1.5rem;
             transform: translateY(100%);
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform var(--transition-spring);
             z-index: 1500;
             max-height: 80vh;
             overflow-y: auto;
             border-top: 1px solid var(--border);
+            will-change: transform;
         }
 
         .bottom-sheet.active {
@@ -1140,6 +1361,11 @@
             background: var(--surface-light);
             border-radius: 2px;
             margin: 0 auto 1.5rem;
+            transition: width var(--transition-fast);
+        }
+
+        .bottom-sheet:active .sheet-handle {
+            width: 60px;
         }
 
         .sheet-overlay {
@@ -1153,7 +1379,7 @@
             z-index: 1400;
             opacity: 0;
             visibility: hidden;
-            transition: all 0.3s;
+            transition: all var(--transition-smooth);
         }
 
         .sheet-overlay.active {
@@ -1161,13 +1387,17 @@
             visibility: visible;
         }
 
-        /* Animations */
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
+        /* Utility Classes */
         .hidden { display: none !important; }
+        
+        /* Reduced Motion */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
     </style>
 </head>
 <body data-theme="dark">
@@ -1214,33 +1444,33 @@
         </div>
 
         <!-- Features Grid -->
-        <div class="features-grid" id="featuresGrid" style="display: none;">
-            <div class="feature-card merge" onclick="selectFeature('merge')">
+        <div class="features-grid" id="featuresGrid">
+            <div class="feature-card merge" data-feature="merge">
                 <i class="fas fa-object-group feature-icon"></i>
                 <div class="feature-title">Merge PDFs</div>
                 <div class="feature-desc">Combine multiple files</div>
             </div>
-            <div class="feature-card split" onclick="selectFeature('split')">
+            <div class="feature-card split" data-feature="split">
                 <i class="fas fa-cut feature-icon"></i>
                 <div class="feature-title">Split PDF</div>
                 <div class="feature-desc">Extract pages</div>
             </div>
-            <div class="feature-card edit" onclick="selectFeature('edit')">
+            <div class="feature-card edit" data-feature="edit">
                 <i class="fas fa-edit feature-icon"></i>
                 <div class="feature-title">Edit PDF</div>
                 <div class="feature-desc">Modify content</div>
             </div>
-            <div class="feature-card compress" onclick="selectFeature('compress')">
+            <div class="feature-card compress" data-feature="compress">
                 <i class="fas fa-compress-alt feature-icon"></i>
                 <div class="feature-title">Compress</div>
                 <div class="feature-desc">Reduce file size</div>
             </div>
-            <div class="feature-card convert" onclick="selectFeature('convert')">
+            <div class="feature-card convert" data-feature="convert">
                 <i class="fas fa-exchange-alt feature-icon"></i>
                 <div class="feature-title">Convert</div>
                 <div class="feature-desc">To/From images</div>
             </div>
-            <div class="feature-card protect" onclick="selectFeature('protect')">
+            <div class="feature-card protect" data-feature="protect">
                 <i class="fas fa-lock feature-icon"></i>
                 <div class="feature-title">Protect</div>
                 <div class="feature-desc">Password & security</div>
@@ -1276,9 +1506,7 @@
                         <i class="fas fa-cut"></i> Split PDF
                     </div>
                 </div>
-                <div id="panelContent">
-                    <!-- Dynamic content based on selected feature -->
-                </div>
+                <div id="panelContent"></div>
             </div>
 
             <!-- Pages Grid -->
@@ -1316,13 +1544,16 @@
         let pdfFiles = [];
         let isDarkTheme = true;
         let isProcessing = false;
-        let mergeQueue = []; // Store files to merge
+        let mergeQueue = [];
+        let toastQueue = [];
+        let isShowingToast = false;
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             setupEventListeners();
             loadRecentFiles();
             checkTheme();
+            setupFeatureCards();
         });
 
         function setupEventListeners() {
@@ -1333,7 +1564,6 @@
             const newFileInput = fileInput.cloneNode(true);
             fileInput.parentNode.replaceChild(newFileInput, fileInput);
             
-            // Re-get reference after cloning
             const freshFileInput = document.getElementById('fileInput');
 
             // Android-friendly click handling
@@ -1353,9 +1583,9 @@
             uploadZone.addEventListener('touchend', (e) => {
                 uploadZone.style.transform = 'scale(1)';
                 if (!isProcessing) {
-                    setTimeout(() => {
+                    requestAnimationFrame(() => {
                         freshFileInput.click();
-                    }, 50);
+                    });
                 }
             }, {passive: true});
 
@@ -1388,12 +1618,22 @@
             });
         }
 
+        function setupFeatureCards() {
+            const cards = document.querySelectorAll('.feature-card');
+            cards.forEach(card => {
+                card.addEventListener('click', () => {
+                    const feature = card.dataset.feature;
+                    selectFeature(feature, card);
+                });
+            });
+        }
+
         async function handleFiles(files, isMerge = false) {
             if (files.length === 0 || isProcessing) return;
 
             const file = files[0];
             if (file.type !== 'application/pdf' && !file.name.endsWith('.pdf')) {
-                showToast('Invalid File', 'Please upload a valid PDF file', 'error');
+                queueToast('Invalid File', 'Please upload a valid PDF file', 'error');
                 return;
             }
 
@@ -1401,12 +1641,10 @@
             showLoading(true);
             
             try {
-                // Clone the array buffer to prevent detachment
                 const originalBuffer = await file.arrayBuffer();
                 const clonedBuffer = originalBuffer.slice(0);
                 
                 if (isMerge) {
-                    // Add to merge queue
                     const mergeFile = {
                         name: file.name,
                         size: file.size,
@@ -1414,13 +1652,12 @@
                     };
                     mergeQueue.push(mergeFile);
                     updateMergeList();
-                    showToast('File Added', `${file.name} added to merge queue`, 'success');
+                    queueToast('File Added', `${file.name} added to merge queue`, 'success');
                     showLoading(false);
                     isProcessing = false;
                     return;
                 }
                 
-                // Normal file loading
                 pdfBytes = new Uint8Array(clonedBuffer);
                 
                 const pdf = await pdfjsLib.getDocument({ data: clonedBuffer.slice(0) }).promise;
@@ -1439,11 +1676,17 @@
                 await renderPageThumbnails(pdf);
                 showWorkspace();
                 
-                document.getElementById('featuresGrid').style.display = 'grid';
-                showToast('PDF Loaded', `${file.name} loaded successfully`, 'success');
+                // Smooth show features grid
+                const grid = document.getElementById('featuresGrid');
+                grid.style.display = 'grid';
+                requestAnimationFrame(() => {
+                    grid.classList.add('visible');
+                });
+                
+                queueToast('PDF Loaded', `${file.name} loaded successfully`, 'success');
             } catch (error) {
                 console.error('PDF Load Error:', error);
-                showToast('Load Failed', error.message, 'error');
+                queueToast('Load Failed', error.message, 'error');
                 currentPDF = null;
                 pdfBytes = null;
             } finally {
@@ -1478,6 +1721,8 @@
             grid.innerHTML = '';
             selectedPages.clear();
 
+            const fragment = document.createDocumentFragment();
+
             for (let i = 1; i <= pdf.numPages; i++) {
                 try {
                     const page = await pdf.getPage(i);
@@ -1496,9 +1741,9 @@
                     const pageItem = document.createElement('div');
                     pageItem.className = 'page-item';
                     pageItem.dataset.page = i;
+                    pageItem.style.animationDelay = `${i * 0.05}s`;
                     
-                    pageItem.addEventListener('click', (e) => {
-                        e.preventDefault();
+                    pageItem.addEventListener('click', () => {
                         togglePageSelection(i);
                     });
 
@@ -1517,11 +1762,13 @@
                     pageItem.appendChild(img);
                     pageItem.appendChild(checkbox);
                     pageItem.appendChild(pageNum);
-                    grid.appendChild(pageItem);
+                    fragment.appendChild(pageItem);
                 } catch (err) {
                     console.error(`Error rendering page ${i}:`, err);
                 }
             }
+            
+            grid.appendChild(fragment);
         }
 
         function togglePageSelection(pageNum) {
@@ -1530,41 +1777,56 @@
             if (selectedPages.has(pageNum)) {
                 selectedPages.delete(pageNum);
                 pageItem.classList.remove('selected');
-                showToast('Page Deselected', `Page ${pageNum} removed from selection`, 'info');
+                queueToast('Page Deselected', `Page ${pageNum} removed`, 'info');
             } else {
                 selectedPages.add(pageNum);
                 pageItem.classList.add('selected');
-                showToast('Page Selected', `Page ${pageNum} added to selection`, 'success');
+                queueToast('Page Selected', `Page ${pageNum} added`, 'success');
             }
 
-            updateActionPanel();
+            // Update status indicator if exists
+            const statusIndicator = document.querySelector('.status-indicator');
+            if (statusIndicator) {
+                statusIndicator.className = `status-indicator ${selectedPages.size > 0 ? 'status-success' : 'status-info'}`;
+                statusIndicator.innerHTML = `
+                    <i class="fas fa-${selectedPages.size > 0 ? 'check-circle' : 'info-circle'}"></i>
+                    <span>${selectedPages.size > 0 ? `${selectedPages.size} pages selected` : 'Select pages or specify range'}</span>
+                `;
+            }
         }
 
-        function selectFeature(feature) {
+        function selectFeature(feature, cardElement) {
+            // Prevent rapid clicking
+            if (isProcessing) return;
+            
             currentFeature = feature;
             
+            // Update UI efficiently
             document.querySelectorAll('.feature-card').forEach(card => {
                 card.classList.remove('active');
             });
-            event.currentTarget.classList.add('active');
+            cardElement.classList.add('active');
 
             // Reset merge queue if not merge feature
             if (feature !== 'merge') {
                 mergeQueue = [];
             }
 
+            // Update panel content
             updateActionPanel();
             
-            const featureNames = {
-                merge: 'Merge PDFs',
-                split: 'Split PDF',
-                edit: 'Edit PDF',
-                compress: 'Compress PDF',
-                convert: 'Convert PDF',
-                protect: 'Protect PDF'
-            };
-            
-            showToast('Mode Activated', `${featureNames[feature]} mode ready`, 'info');
+            // Show toast with slight delay for smooth animation
+            setTimeout(() => {
+                const featureNames = {
+                    merge: 'Merge PDFs',
+                    split: 'Split PDF',
+                    edit: 'Edit PDF',
+                    compress: 'Compress PDF',
+                    convert: 'Convert PDF',
+                    protect: 'Protect PDF'
+                };
+                queueToast('Mode Activated', `${featureNames[feature]} ready`, 'info');
+            }, 100);
         }
 
         function updateActionPanel() {
@@ -1574,176 +1836,179 @@
 
             if (!currentFeature) return;
 
-            panel.classList.add('active');
-
-            switch(currentFeature) {
-                case 'merge':
-                    title.innerHTML = '<i class="fas fa-object-group"></i> Merge PDFs';
-                    content.innerHTML = `
-                        <div class="status-indicator status-info">
-                            <i class="fas fa-info-circle"></i>
-                            <span>Add PDFs to merge with the current document</span>
-                        </div>
-                        <input type="file" accept=".pdf,application/pdf" id="mergeFileInput" style="display: none;">
-                        <button class="btn btn-primary" onclick="triggerMergeUpload()" style="width: 100%; margin-bottom: 1rem;">
-                            <i class="fas fa-plus"></i> Add PDF to Merge
-                        </button>
-                        <div class="merge-list" id="mergeList">
-                            <div class="merge-item">
-                                <i class="fas fa-file-pdf"></i>
-                                <div class="merge-item-info">
-                                    <div class="merge-item-name">Current Document</div>
-                                    <div class="merge-item-status">Base file • Ready</div>
+            // Use requestAnimationFrame for smooth rendering
+            requestAnimationFrame(() => {
+                panel.classList.add('active');
+                
+                switch(currentFeature) {
+                    case 'merge':
+                        title.innerHTML = '<i class="fas fa-object-group"></i> Merge PDFs';
+                        content.innerHTML = `
+                            <div class="status-indicator status-info">
+                                <i class="fas fa-info-circle"></i>
+                                <span>Add PDFs to merge with the current document</span>
+                            </div>
+                            <input type="file" accept=".pdf,application/pdf" id="mergeFileInput" style="display: none;">
+                            <button class="btn btn-primary" onclick="triggerMergeUpload()" style="width: 100%; margin-bottom: 1rem;">
+                                <i class="fas fa-plus"></i> Add PDF to Merge
+                            </button>
+                            <div class="merge-list" id="mergeList">
+                                <div class="merge-item">
+                                    <i class="fas fa-file-pdf"></i>
+                                    <div class="merge-item-info">
+                                        <div class="merge-item-name">Current Document</div>
+                                        <div class="merge-item-status">Base file • Ready</div>
+                                    </div>
+                                    <i class="fas fa-check-circle" style="color: var(--success);"></i>
                                 </div>
-                                <i class="fas fa-check-circle" style="color: var(--success);"></i>
                             </div>
-                        </div>
-                        <div id="mergeActions" style="margin-top: 1rem; display: none;">
-                            <button class="btn btn-success" onclick="processMerge()" style="width: 100%;">
-                                <i class="fas fa-merge"></i> Merge All Files
-                            </button>
-                        </div>
-                    `;
-                    
-                    // Setup merge file input listener
-                    setTimeout(() => {
-                        const mergeInput = document.getElementById('mergeFileInput');
-                        if (mergeInput) {
-                            mergeInput.addEventListener('change', (e) => {
-                                if (e.target.files.length > 0) {
-                                    handleFiles(e.target.files, true);
-                                    e.target.value = '';
-                                }
-                            });
-                        }
-                    }, 100);
-                    break;
+                            <div id="mergeActions" style="margin-top: 1rem; display: none;">
+                                <button class="btn btn-success" onclick="processMerge()" style="width: 100%;">
+                                    <i class="fas fa-code-branch"></i> Merge All Files
+                                </button>
+                            </div>
+                        `;
+                        
+                        // Setup merge file input listener
+                        setTimeout(() => {
+                            const mergeInput = document.getElementById('mergeFileInput');
+                            if (mergeInput) {
+                                mergeInput.addEventListener('change', (e) => {
+                                    if (e.target.files.length > 0) {
+                                        handleFiles(e.target.files, true);
+                                        e.target.value = '';
+                                    }
+                                });
+                            }
+                        }, 0);
+                        break;
 
-                case 'split':
-                    title.innerHTML = '<i class="fas fa-cut"></i> Split PDF';
-                    content.innerHTML = `
-                        <div class="status-indicator ${selectedPages.size > 0 ? 'status-success' : 'status-info'}">
-                            <i class="fas fa-${selectedPages.size > 0 ? 'check-circle' : 'info-circle'}"></i>
-                            <span>${selectedPages.size > 0 ? `${selectedPages.size} pages selected` : 'Select pages or specify range'}</span>
-                        </div>
-                        <div class="range-inputs">
-                            <div class="input-group">
-                                <label>From Page</label>
-                                <input type="number" id="splitFrom" min="1" max="${currentPDF.numPages}" value="1">
+                    case 'split':
+                        title.innerHTML = '<i class="fas fa-cut"></i> Split PDF';
+                        content.innerHTML = `
+                            <div class="status-indicator ${selectedPages.size > 0 ? 'status-success' : 'status-info'}">
+                                <i class="fas fa-${selectedPages.size > 0 ? 'check-circle' : 'info-circle'}"></i>
+                                <span>${selectedPages.size > 0 ? `${selectedPages.size} pages selected` : 'Select pages or specify range'}</span>
                             </div>
-                            <div class="input-group">
-                                <label>To Page</label>
-                                <input type="number" id="splitTo" min="1" max="${currentPDF.numPages}" value="${currentPDF.numPages}">
+                            <div class="range-inputs">
+                                <div class="input-group">
+                                    <label>From Page</label>
+                                    <input type="number" id="splitFrom" min="1" max="${currentPDF.numPages}" value="1">
+                                </div>
+                                <div class="input-group">
+                                    <label>To Page</label>
+                                    <input type="number" id="splitTo" min="1" max="${currentPDF.numPages}" value="${currentPDF.numPages}">
+                                </div>
                             </div>
-                        </div>
-                        <p style="margin-top: 0.5rem; font-size: 0.875rem; color: var(--text-muted);">
-                            <i class="fas fa-mouse-pointer"></i> Or tap pages above to select individually
-                        </p>
-                    `;
-                    break;
+                            <p style="margin-top: 0.5rem; font-size: 0.875rem; color: var(--text-muted);">
+                                <i class="fas fa-mouse-pointer"></i> Or tap pages above to select individually
+                            </p>
+                        `;
+                        break;
 
-                case 'edit':
-                    title.innerHTML = '<i class="fas fa-edit"></i> Edit PDF';
-                    content.innerHTML = `
-                        <div class="status-indicator status-warning">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            <span>Basic editing only - Advanced features require server</span>
-                        </div>
-                        <div class="text-editor">
-                            <div class="toolbar">
-                                <button class="toolbar-btn" onclick="formatText('bold')"><i class="fas fa-bold"></i></button>
-                                <button class="toolbar-btn" onclick="formatText('italic')"><i class="fas fa-italic"></i></button>
-                                <button class="toolbar-btn" onclick="formatText('underline')"><i class="fas fa-underline"></i></button>
-                                <button class="toolbar-btn" onclick="addText()"><i class="fas fa-font"></i></button>
+                    case 'edit':
+                        title.innerHTML = '<i class="fas fa-edit"></i> Edit PDF';
+                        content.innerHTML = `
+                            <div class="status-indicator status-warning">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <span>Basic editing only - Advanced features require server</span>
                             </div>
-                            <div class="editor-content" contenteditable="true" id="editorContent">
-                                Click here to add text annotations...
+                            <div class="text-editor">
+                                <div class="toolbar">
+                                    <button class="toolbar-btn" onclick="formatText('bold')"><i class="fas fa-bold"></i></button>
+                                    <button class="toolbar-btn" onclick="formatText('italic')"><i class="fas fa-italic"></i></button>
+                                    <button class="toolbar-btn" onclick="formatText('underline')"><i class="fas fa-underline"></i></button>
+                                    <button class="toolbar-btn" onclick="addText()"><i class="fas fa-font"></i></button>
+                                </div>
+                                <div class="editor-content" contenteditable="true" id="editorContent">
+                                    Click here to add text annotations...
+                                </div>
                             </div>
-                        </div>
-                    `;
-                    break;
+                        `;
+                        break;
 
-                case 'compress':
-                    title.innerHTML = '<i class="fas fa-compress-alt"></i> Compress PDF';
-                    content.innerHTML = `
-                        <div class="status-indicator status-info">
-                            <i class="fas fa-info-circle"></i>
-                            <span>Reduce file size while maintaining readability</span>
-                        </div>
-                        <div class="input-group" style="margin-bottom: 1rem;">
-                            <label>Compression Level</label>
-                            <select id="compressLevel" style="width: 100%; padding: 0.75rem; border-radius: 8px; background: var(--input-bg); color: var(--text); border: 1px solid var(--surface-light);">
-                                <option value="low">Low (Best Quality)</option>
-                                <option value="medium" selected>Medium (Recommended)</option>
-                                <option value="high">High (Smallest Size)</option>
-                            </select>
-                        </div>
-                        <div style="background: var(--input-bg); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border: 1px solid var(--border);">
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                                <span style="color: var(--text-muted);">Original Size</span>
-                                <span id="currentSize" style="color: var(--text);">${(pdfBytes.length / 1024).toFixed(1)} KB</span>
+                    case 'compress':
+                        title.innerHTML = '<i class="fas fa-compress-alt"></i> Compress PDF';
+                        content.innerHTML = `
+                            <div class="status-indicator status-info">
+                                <i class="fas fa-info-circle"></i>
+                                <span>Reduce file size while maintaining readability</span>
                             </div>
-                            <div style="display: flex; justify-content: space-between; color: var(--success);">
-                                <span>Estimated Savings</span>
-                                <span id="estimatedSize">30-50%</span>
+                            <div class="input-group" style="margin-bottom: 1rem;">
+                                <label>Compression Level</label>
+                                <select id="compressLevel" style="width: 100%; padding: 0.75rem; border-radius: 8px; background: var(--input-bg); color: var(--text); border: 1px solid var(--surface-light);">
+                                    <option value="low">Low (Best Quality)</option>
+                                    <option value="medium" selected>Medium (Recommended)</option>
+                                    <option value="high">High (Smallest Size)</option>
+                                </select>
                             </div>
-                        </div>
-                    `;
-                    break;
+                            <div style="background: var(--input-bg); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border: 1px solid var(--border);">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                    <span style="color: var(--text-muted);">Original Size</span>
+                                    <span id="currentSize" style="color: var(--text);">${(pdfBytes.length / 1024).toFixed(1)} KB</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; color: var(--success);">
+                                    <span>Estimated Savings</span>
+                                    <span id="estimatedSize">30-50%</span>
+                                </div>
+                            </div>
+                        `;
+                        break;
 
-                case 'convert':
-                    title.innerHTML = '<i class="fas fa-exchange-alt"></i> Convert PDF';
-                    content.innerHTML = `
-                        <div class="status-indicator status-info">
-                            <i class="fas fa-info-circle"></i>
-                            <span>Convert to different formats</span>
-                        </div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
-                            <button class="btn btn-secondary" onclick="convertTo('jpg')">
-                                <i class="fas fa-image"></i> To JPG
-                            </button>
-                            <button class="btn btn-secondary" onclick="convertTo('png')">
-                                <i class="fas fa-image"></i> To PNG
-                            </button>
-                            <button class="btn btn-secondary" onclick="convertTo('word')">
-                                <i class="fas fa-file-word"></i> To Word
-                            </button>
-                            <button class="btn btn-secondary" onclick="convertTo('text')">
-                                <i class="fas fa-file-alt"></i> To Text
-                            </button>
-                        </div>
-                    `;
-                    break;
-
-                case 'protect':
-                    title.innerHTML = '<i class="fas fa-lock"></i> Protect PDF';
-                    content.innerHTML = `
-                        <div class="status-indicator status-warning">
-                            <i class="fas fa-shield-alt"></i>
-                            <span>Add password protection to your PDF</span>
-                        </div>
-                        <div class="input-group" style="margin-bottom: 1rem;">
-                            <label>Set Password</label>
-                            <input type="password" id="pdfPassword" placeholder="Min 4 characters" oninput="checkPasswordStrength(this.value)" style="background: var(--input-bg); color: var(--text);">
-                            <div class="password-strength">
-                                <div class="password-strength-bar" id="passwordStrength"></div>
+                    case 'convert':
+                        title.innerHTML = '<i class="fas fa-exchange-alt"></i> Convert PDF';
+                        content.innerHTML = `
+                            <div class="status-indicator status-info">
+                                <i class="fas fa-info-circle"></i>
+                                <span>Convert to different formats</span>
                             </div>
-                        </div>
-                        <div class="input-group" style="margin-bottom: 1rem;">
-                            <label>Confirm Password</label>
-                            <input type="password" id="confirmPassword" placeholder="Re-enter password" style="background: var(--input-bg); color: var(--text);">
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
-                            <input type="checkbox" id="allowPrinting" checked style="width: 18px; height: 18px;">
-                            <label for="allowPrinting" style="font-size: 0.875rem; color: var(--text);">Allow printing</label>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 0.5rem;">
-                            <input type="checkbox" id="allowCopying" style="width: 18px; height: 18px;">
-                            <label for="allowCopying" style="font-size: 0.875rem; color: var(--text);">Allow copying text</label>
-                        </div>
-                    `;
-                    break;
-            }
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                                <button class="btn btn-secondary" onclick="convertTo('jpg')">
+                                    <i class="fas fa-image"></i> To JPG
+                                </button>
+                                <button class="btn btn-secondary" onclick="convertTo('png')">
+                                    <i class="fas fa-image"></i> To PNG
+                                </button>
+                                <button class="btn btn-secondary" onclick="convertTo('word')">
+                                    <i class="fas fa-file-word"></i> To Word
+                                </button>
+                                <button class="btn btn-secondary" onclick="convertTo('text')">
+                                    <i class="fas fa-file-alt"></i> To Text
+                                </button>
+                            </div>
+                        `;
+                        break;
+
+                    case 'protect':
+                        title.innerHTML = '<i class="fas fa-lock"></i> Protect PDF';
+                        content.innerHTML = `
+                            <div class="status-indicator status-warning">
+                                <i class="fas fa-shield-alt"></i>
+                                <span>Add password protection to your PDF</span>
+                            </div>
+                            <div class="input-group" style="margin-bottom: 1rem;">
+                                <label>Set Password</label>
+                                <input type="password" id="pdfPassword" placeholder="Min 4 characters" oninput="checkPasswordStrength(this.value)" style="background: var(--input-bg); color: var(--text);">
+                                <div class="password-strength">
+                                    <div class="password-strength-bar" id="passwordStrength"></div>
+                                </div>
+                            </div>
+                            <div class="input-group" style="margin-bottom: 1rem;">
+                                <label>Confirm Password</label>
+                                <input type="password" id="confirmPassword" placeholder="Re-enter password" style="background: var(--input-bg); color: var(--text);">
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+                                <input type="checkbox" id="allowPrinting" checked style="width: 18px; height: 18px;">
+                                <label for="allowPrinting" style="font-size: 0.875rem; color: var(--text);">Allow printing</label>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="checkbox" id="allowCopying" style="width: 18px; height: 18px;">
+                                <label for="allowCopying" style="font-size: 0.875rem; color: var(--text);">Allow copying text</label>
+                            </div>
+                        `;
+                        break;
+                }
+            });
         }
 
         function triggerMergeUpload() {
@@ -1793,15 +2058,16 @@
         function removeFromMerge(index) {
             mergeQueue.splice(index, 1);
             updateMergeList();
-            showToast('File Removed', 'File removed from merge queue', 'warning');
+            queueToast('File Removed', 'File removed from merge queue', 'warning');
         }
 
         async function processMerge() {
             if (mergeQueue.length === 0) {
-                showToast('No Files', 'Please add at least one PDF to merge', 'warning');
+                queueToast('No Files', 'Please add at least one PDF to merge', 'warning');
                 return;
             }
 
+            isProcessing = true;
             showLoading(true);
             
             try {
@@ -1822,20 +2088,21 @@
                 const mergedBytes = await mergedPdf.save();
                 download(mergedBytes, 'merged.pdf', 'application/pdf');
                 
-                showToast('Merge Complete', `Successfully merged ${mergeQueue.length + 1} PDFs`, 'success');
+                queueToast('Merge Complete', `Successfully merged ${mergeQueue.length + 1} PDFs`, 'success');
                 mergeQueue = [];
                 updateMergeList();
             } catch (error) {
                 console.error(error);
-                showToast('Merge Failed', error.message, 'error');
+                queueToast('Merge Failed', error.message, 'error');
             } finally {
+                isProcessing = false;
                 showLoading(false);
             }
         }
 
         async function processAction() {
             if (!currentFeature || !pdfBytes) {
-                showToast('No Feature Selected', 'Please select a feature first', 'warning');
+                queueToast('No Feature Selected', 'Please select a feature first', 'warning');
                 return;
             }
 
@@ -1844,6 +2111,7 @@
                 return;
             }
 
+            isProcessing = true;
             showLoading(true);
 
             try {
@@ -1861,13 +2129,14 @@
                             copiedPages.forEach(page => newPdf.addPage(page));
                             modifiedPdf = newPdf;
                             fileName = 'split.pdf';
-                            showToast('Split Complete', `Extracted ${pages.length} pages`, 'success');
+                            queueToast('Split Complete', `Extracted ${pages.length} pages`, 'success');
                         } else {
                             const from = parseInt(document.getElementById('splitFrom').value);
                             const to = parseInt(document.getElementById('splitTo').value);
                             
                             if (from > to || from < 1 || to > currentPDF.numPages) {
-                                showToast('Invalid Range', 'Please check page numbers', 'error');
+                                queueToast('Invalid Range', 'Please check page numbers', 'error');
+                                isProcessing = false;
                                 showLoading(false);
                                 return;
                             }
@@ -1879,7 +2148,7 @@
                             copiedPages.forEach(page => newPdf.addPage(page));
                             modifiedPdf = newPdf;
                             fileName = `pages_${from}-${to}.pdf`;
-                            showToast('Split Complete', `Extracted pages ${from}-${to}`, 'success');
+                            queueToast('Split Complete', `Extracted pages ${from}-${to}`, 'success');
                         }
                         break;
 
@@ -1888,19 +2157,22 @@
                         const confirmPass = document.getElementById('confirmPassword').value;
                         
                         if (!password || !confirmPass) {
-                            showToast('Password Required', 'Please enter and confirm password', 'warning');
+                            queueToast('Password Required', 'Please enter and confirm password', 'warning');
+                            isProcessing = false;
                             showLoading(false);
                             return;
                         }
                         
                         if (password !== confirmPass) {
-                            showToast('Password Mismatch', 'Passwords do not match', 'error');
+                            queueToast('Password Mismatch', 'Passwords do not match', 'error');
+                            isProcessing = false;
                             showLoading(false);
                             return;
                         }
                         
                         if (password.length < 4) {
-                            showToast('Password Too Short', 'Minimum 4 characters required', 'warning');
+                            queueToast('Password Too Short', 'Minimum 4 characters required', 'warning');
+                            isProcessing = false;
                             showLoading(false);
                             return;
                         }
@@ -1922,39 +2194,37 @@
                         });
                         
                         fileName = 'protected.pdf';
-                        showToast('Protection Added', 'PDF secured with password', 'success');
+                        queueToast('Protection Added', 'PDF secured with password', 'success');
                         break;
 
                     case 'compress':
-                        showToast('Compression Started', 'Processing PDF...', 'info');
-                        // Note: Actual compression requires server-side or advanced libraries
-                        // For now, we'll just re-save which may optimize slightly
+                        queueToast('Compression Started', 'Processing PDF...', 'info');
                         fileName = 'compressed.pdf';
-                        showToast('Compression Complete', 'File optimized', 'success');
+                        queueToast('Compression Complete', 'File optimized', 'success');
                         break;
 
                     case 'edit':
-                        showToast('Feature Limited', 'Full editing requires server processing', 'warning');
+                        queueToast('Feature Limited', 'Full editing requires server processing', 'warning');
+                        isProcessing = false;
                         showLoading(false);
                         return;
                         
                     case 'convert':
-                        showToast('Select Format', 'Please choose a conversion format', 'info');
+                        queueToast('Select Format', 'Please choose a conversion format', 'info');
+                        isProcessing = false;
                         showLoading(false);
                         return;
                 }
 
-                if (currentFeature !== 'compress' && currentFeature !== 'edit' && currentFeature !== 'convert') {
-                    const newBytes = await modifiedPdf.save();
-                    download(newBytes, fileName, 'application/pdf');
-                } else if (currentFeature === 'compress') {
+                if (currentFeature !== 'edit' && currentFeature !== 'convert') {
                     const newBytes = await modifiedPdf.save();
                     download(newBytes, fileName, 'application/pdf');
                 }
             } catch (error) {
                 console.error(error);
-                showToast('Processing Failed', error.message, 'error');
+                queueToast('Processing Failed', error.message, 'error');
             } finally {
+                isProcessing = false;
                 showLoading(false);
             }
         }
@@ -1963,7 +2233,11 @@
         function showWorkspace() {
             document.getElementById('uploadZone').style.display = 'none';
             document.getElementById('recentFiles').style.display = 'none';
-            document.getElementById('pdfWorkspace').classList.add('active');
+            const workspace = document.getElementById('pdfWorkspace');
+            workspace.style.display = 'block';
+            requestAnimationFrame(() => {
+                workspace.classList.add('active');
+            });
         }
 
         function clearWorkspace() {
@@ -1973,29 +2247,61 @@
             currentFeature = null;
             mergeQueue = [];
             
-            document.getElementById('uploadZone').style.display = 'block';
-            document.getElementById('featuresGrid').style.display = 'none';
-            document.getElementById('pdfWorkspace').classList.remove('active');
-            document.getElementById('actionPanel').classList.remove('active');
-            document.getElementById('recentFiles').style.display = 'block';
+            const workspace = document.getElementById('pdfWorkspace');
+            workspace.classList.remove('active');
             
-            const fileInput = document.getElementById('fileInput');
-            fileInput.value = '';
-            
-            setupEventListeners();
-            
-            document.querySelectorAll('.feature-card').forEach(card => {
-                card.classList.remove('active');
-            });
-            
-            showToast('Workspace Cleared', 'Ready for new file', 'info');
+            setTimeout(() => {
+                workspace.style.display = 'none';
+                document.getElementById('uploadZone').style.display = 'block';
+                document.getElementById('featuresGrid').style.display = 'none';
+                document.getElementById('featuresGrid').classList.remove('visible');
+                document.getElementById('actionPanel').classList.remove('active');
+                document.getElementById('recentFiles').style.display = 'block';
+                
+                const fileInput = document.getElementById('fileInput');
+                fileInput.value = '';
+                
+                setupEventListeners();
+                
+                document.querySelectorAll('.feature-card').forEach(card => {
+                    card.classList.remove('active');
+                });
+                
+                queueToast('Workspace Cleared', 'Ready for new file', 'info');
+            }, 300);
         }
 
         function showLoading(show) {
-            document.getElementById('loadingOverlay').classList.toggle('active', show);
+            const overlay = document.getElementById('loadingOverlay');
+            if (show) {
+                overlay.classList.add('active');
+            } else {
+                setTimeout(() => {
+                    overlay.classList.remove('active');
+                }, 300);
+            }
         }
 
-        function showToast(title, message, type = 'info') {
+        // Optimized Toast System with Queue
+        function queueToast(title, message, type = 'info') {
+            toastQueue.push({ title, message, type });
+            if (!isShowingToast) {
+                processToastQueue();
+            }
+        }
+
+        function processToastQueue() {
+            if (toastQueue.length === 0) {
+                isShowingToast = false;
+                return;
+            }
+
+            isShowingToast = true;
+            const { title, message, type } = toastQueue.shift();
+            showToastElement(title, message, type);
+        }
+
+        function showToastElement(title, message, type) {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;
@@ -2015,7 +2321,7 @@
                     <div class="toast-title">${title}</div>
                     <div class="toast-message">${message}</div>
                 </div>
-                <button class="toast-close" onclick="this.parentElement.remove()">
+                <button class="toast-close" onclick="dismissToast(this.parentElement)">
                     <i class="fas fa-times"></i>
                 </button>
             `;
@@ -2023,13 +2329,25 @@
             container.appendChild(toast);
             
             // Auto remove after 4 seconds
-            setTimeout(() => {
-                if (toast.parentElement) {
-                    toast.style.opacity = '0';
-                    toast.style.transform = 'translate(-50%, 20px) scale(0.9)';
-                    setTimeout(() => toast.remove(), 300);
-                }
+            const autoRemoveTimer = setTimeout(() => {
+                dismissToast(toast);
             }, 4000);
+            
+            // Store timer on element
+            toast.dataset.timer = autoRemoveTimer;
+        }
+
+        function dismissToast(toast) {
+            if (toast.dataset.timer) {
+                clearTimeout(parseInt(toast.dataset.timer));
+            }
+            
+            toast.classList.add('exit');
+            setTimeout(() => {
+                toast.remove();
+                // Process next toast
+                setTimeout(processToastQueue, 100);
+            }, 300);
         }
 
         function checkPasswordStrength(password) {
@@ -2051,7 +2369,7 @@
 
         function formatText(command) {
             document.execCommand(command, false, null);
-            showToast('Formatting Applied', `${command} text style applied`, 'success');
+            queueToast('Formatting Applied', `${command} text style applied`, 'success');
         }
 
         function addText() {
@@ -2059,7 +2377,7 @@
             if (editor) {
                 editor.focus();
                 document.execCommand('insertText', false, ' [New Text] ');
-                showToast('Text Added', 'New text inserted', 'success');
+                queueToast('Text Added', 'New text inserted', 'success');
             }
         }
 
@@ -2071,10 +2389,10 @@
                 text: 'Plain Text'
             };
             
-            showToast('Conversion Started', `Converting to ${formatNames[format]}...`, 'info');
+            queueToast('Conversion Started', `Converting to ${formatNames[format]}...`, 'info');
             
             setTimeout(() => {
-                showToast('Conversion Demo', 'This is a demo. Full conversion requires server processing.', 'warning');
+                queueToast('Conversion Demo', 'This is a demo. Full conversion requires server processing.', 'warning');
             }, 1500);
         }
 
@@ -2086,7 +2404,7 @@
             const btn = document.getElementById('themeBtn');
             btn.innerHTML = isDarkTheme ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
             
-            showToast('Theme Changed', isDarkTheme ? 'Dark mode enabled' : 'Light mode enabled', 'success');
+            queueToast('Theme Changed', isDarkTheme ? 'Dark mode enabled' : 'Light mode enabled', 'success');
         }
 
         function checkTheme() {
@@ -2099,7 +2417,7 @@
         }
 
         function showHelp() {
-            showToast('Quick Help', 'Select a feature → Configure options → Apply Changes', 'info');
+            queueToast('Quick Help', 'Select a feature → Configure options → Apply Changes', 'info');
         }
 
         // Recent Files Functions
@@ -2145,7 +2463,7 @@
             try {
                 const recent = JSON.parse(localStorage.getItem('recentPDFs') || '[]');
                 if (!recent[index] || !recent[index].data) {
-                    showToast('File Unavailable', 'File data not found in storage', 'error');
+                    queueToast('File Unavailable', 'File data not found in storage', 'error');
                     return;
                 }
                 
@@ -2169,16 +2487,21 @@
                 await renderPageThumbnails(pdf);
                 showWorkspace();
                 
-                document.getElementById('featuresGrid').style.display = 'grid';
-                showToast('File Loaded', `${fileData.name} loaded from recent files`, 'success');
+                const grid = document.getElementById('featuresGrid');
+                grid.style.display = 'grid';
+                requestAnimationFrame(() => {
+                    grid.classList.add('visible');
+                });
+                
+                queueToast('File Loaded', `${fileData.name} loaded from recent files`, 'success');
             } catch (error) {
                 console.error('Error loading recent file:', error);
-                showToast('Load Failed', error.message, 'error');
+                queueToast('Load Failed', error.message, 'error');
                 currentPDF = null;
                 pdfBytes = null;
             } finally {
-                showLoading(false);
                 isProcessing = false;
+                showLoading(false);
             }
         }
 
@@ -2189,7 +2512,7 @@
                 recent.splice(index, 1);
                 localStorage.setItem('recentPDFs', JSON.stringify(recent));
                 loadRecentFiles();
-                showToast('File Removed', `${fileName} removed from recent files`, 'success');
+                queueToast('File Removed', `${fileName} removed from recent files`, 'success');
             } catch (e) {
                 console.error('Error deleting recent file:', e);
             }
